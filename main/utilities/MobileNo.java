@@ -61,7 +61,7 @@ public class MobileNo {
     @Override
     public String toString() {
         return "MobileNo{" +
-                "Name= " + fname + mname + '\'' +lname + '\'' +
+                "Name= " + fname +  " " + mname + " " +lname + '\'' +
                 ", city= " + city + '\'' +
                 ", mobileNo= " + mobileNo + '\'' +
                 '}';

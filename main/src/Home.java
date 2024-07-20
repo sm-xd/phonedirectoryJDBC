@@ -11,9 +11,9 @@ import main.utilities.connectDB;
 public class Home {
 
     private Frame frame = new Frame("Dynamic AWT Window");
-    private Panel p1,p2, p3;
+    private Panel p1,p2, p3,savePanel,searchPanel;
     private Label one, two, three, four, five; 
-    private TextField tname, tlname, tmname, city, tmobile; 
+    private TextField tname, tlname, tmname, city, tmobile,searchMobile; 
     private Button buttonSave, buttonSearch; 
     private TextArea textArea;
     private FlowLayout layout = new FlowLayout();
@@ -26,8 +26,10 @@ public class Home {
 
         p1 = new Panel();
         p1.setLayout(new GridLayout(5, 2)); 
-        p2 = new Panel(layout);
+        p2 = new Panel(new GridLayout(2, 0));
         p3 = new Panel(layout);
+        savePanel = new Panel(layout);
+        searchPanel = new Panel(layout);
         p3.setSize(400, 200);
 
         one = new Label("  FIRST NAME"); 
@@ -40,9 +42,10 @@ public class Home {
         city = new TextField(20);
         five = new Label("  MOBILE"); 
         tmobile = new TextField(20);
+        searchMobile = new TextField(20);
         buttonSave = new Button("SAVE"); 
         buttonSearch = new Button("SEARCH");
-        textArea = new TextArea("TEXTAREA",10,45,TextArea.SCROLLBARS_VERTICAL_ONLY);
+        textArea = new TextArea("TEXTAREA",10,65,TextArea.SCROLLBARS_VERTICAL_ONLY);
 
         p1.add(one);
         p1.add(tname); 
@@ -54,22 +57,35 @@ public class Home {
         p1.add(city); 
         p1.add(five); 
         p1.add(tmobile);
-        p2.add(buttonSave); 
-        p2.add(buttonSearch);
+        searchPanel.add(searchMobile);
+        searchPanel.add(buttonSearch);
+        savePanel.add(buttonSave);
+        p2.add(savePanel); 
+        p2.add(searchPanel);
         p3.add(textArea);
 
         frame.add(p1, "North"); 
         frame.add(p2, "Center"); 
         frame.add(p3, "South"); 
 
-        frame.setSize(400, 400);
+        frame.setSize(600, 400);
         frame.setResizable(true);
 
         buttonSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle button click event
-                System.out.println("Button was clicked!");
+                String mobileNo = searchMobile.getText().trim();
+                if (mobileNo.isEmpty() || !mobileNo.matches("\\d{10}")) {
+                    textArea.setText("Enter valid mobile number.");
+                    return;
+                }
+                SearchMobile search = new SearchMobile();
+                MobileNo contact = search.searchByMobileNo(conn,mobileNo);
+                if(contact == null){
+                    textArea.setText("Contact not found.");
+                    return;
+                }
+                textArea.setText(contact.toString());
             }
         });
 
