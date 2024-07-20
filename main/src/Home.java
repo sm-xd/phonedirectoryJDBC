@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
 
+import main.utilities.MobileNo;
+import main.utilities.connectDB;
+
 
 public class Home {
 
@@ -73,8 +76,20 @@ public class Home {
         buttonSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(!checkConstarints()){
-
+                MobileNo mobileNo = new MobileNo(tname.getText().trim(),  tmname.getText().trim(), tlname.getText().trim(), city.getText().trim(), tmobile.getText().trim());
+                String err = checkConstarints(mobileNo);
+                if(err != null){
+                    textArea.setText(err);
+                }
+                else{
+                    try {
+                        AddMobileNo addMobileNo = new AddMobileNo();
+                        addMobileNo.addData(mobileNo, conn);
+                        textArea.setText(mobileNo.toString());
+                        System.out.println("added 1 entry");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
 
             }
@@ -83,6 +98,11 @@ public class Home {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                try {
+                    connectDB.closeConnection();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 frame.dispose();
                 System.exit(0);
             }
@@ -91,20 +111,40 @@ public class Home {
         // frame.setLayout(new BorderLayout());
         frame.setVisible(true);
     }
-    private boolean checkConstarints() {
-        String firstName = tname.getText().trim();
-        String middleName = tmname.getText().trim();
-        String lastName = tlname.getText().trim();
-        String cityName = city.getText().trim();
-        String mobileNumber = tmobile.getText().trim();
+    private String checkConstarints(MobileNo mobileNo) {
 
-        if (firstName.isEmpty() || middleName.isEmpty() || lastName.isEmpty() || cityName.isEmpty() || mobileNumber.isEmpty()) {
-            return false;
+        boolean allFieldsFilled = true;
+        StringBuilder errorMessage = new StringBuilder();
+
+        if (mobileNo.getFname().isEmpty()) {
+            errorMessage.append("First Name is required.\n");
+            allFieldsFilled = false;
+        }
+        if (mobileNo.getCity().isEmpty()) {
+            errorMessage.append("City is required.\n");
+            allFieldsFilled = false;
+        }
+        if (mobileNo.getMobileNo().isEmpty()) {
+            errorMessage.append("Mobile Number is required.\n");
+            allFieldsFilled = false;
+        }
+        if (!mobileNo.getMobileNo().matches("\\d{10}")) {
+            errorMessage.append("Mobile Number must be exactly 10 digits.\n");
+            allFieldsFilled = false;
+        }
+        if (!mobileNo.getFname().matches("^[a-zA-Z]+$")) {
+            errorMessage.append("Name Should contain only alphabets\n");
+            allFieldsFilled = false;
+        }
+        if ((!mobileNo.getMname().isEmpty() && !mobileNo.getMname().matches("^[a-zA-Z]+$"))|| (!mobileNo.getLname().isEmpty() && !mobileNo.getLname().matches("^[a-zA-Z]+$"))) {
+            errorMessage.append("Name Should contain alphabets only.\n");
+            allFieldsFilled = false;
         }
 
-        if (!mobileNumber.matches("\\d{10}")) {
-            return false;
+        if (!allFieldsFilled) {
+            return errorMessage.toString();
         }
-        return true;
+        return null;
+        
     }
 }

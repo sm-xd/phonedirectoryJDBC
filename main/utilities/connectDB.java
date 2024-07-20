@@ -8,9 +8,9 @@ public class connectDB {
     private static String user = "postgres";
     private static String password = "noman";
     private static String connectionUrl = "jdbc:postgresql://localhost:5432/phdir";
+    private static Connection conn = null;
 
     public static Connection createConnection() {
-        Connection conn = null;
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -22,7 +22,7 @@ public class connectDB {
         return null;
     }
 
-    public static void closeConnection(Connection conn) throws SQLException {
+    public static void closeConnection() throws SQLException {
         try {
             conn.close();
         } catch (Exception e) {
